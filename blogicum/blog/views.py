@@ -13,8 +13,8 @@ from .constants import PAGE_LIMIT
 from django.views.generic import DetailView, ListView, UpdateView, CreateView, DeleteView
 
 
-
 User = get_user_model()
+
 
 def post_base_query():
     return Post.objects.select_related(
@@ -54,9 +54,20 @@ class CategoryListView(ListView):
     def get_queryset(self):
         queryset = post_base_query(
         ).filter(
-            category__slug=self.kwargs['category_slug']
+            category__slug=self.kwargs['category_slug'],
+            author=self.request.user
         )
+        print(f"Current user: {self.request.user}")
         return queryset
+    # def get_queryset(self):
+    #     queryset = post_base_query().filter(
+    #         category__slug=self.kwargs['category_slug']
+    #     )
+
+    #     queryset = queryset.filter(author=self.request.user)
+    #     print(f"Current user: {self.request.user}")
+
+    #     return queryset
 
 
 class ProfileListView(ListView):
@@ -146,8 +157,10 @@ class PostDeleteView(OnlyAuthorMixin, DeleteView):
 class ProfileUpdateView(UpdateView):
     form_class = ProfileForm
     template_name = 'blog/user.html'
+
     def get_object(self, queryset=None):
         return self.request.user
+
 
 class CommentCreateView(LoginRequiredMixin, CreateView):
     post_obj = None
