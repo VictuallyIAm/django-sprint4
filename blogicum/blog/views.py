@@ -83,7 +83,8 @@ class ProfileListView(ListView):
             ).filter(
                 author__username=self.kwargs['slug'],
             ).annotate(
-                comment_count=Count('comments'))
+                comment_count=Count('comments')
+            ).order_by('-pub_date')
         else:
             queryset = post_base_query(
             ).filter(
@@ -110,7 +111,7 @@ class PostDetailView(UserPassesTestMixin, DetailView):
 
     def test_func(self):
         post = self.get_object()
-        if post.is_published:
+        if post in post_base_query():
             return True
         return post.author == self.request.user
 
