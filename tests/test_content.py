@@ -96,7 +96,7 @@ class ContentTester(ABC):
         url = url or self.page_url.url
         try:
             response = client.get(url)
-            print(f"URL: {url}, Status Code: {response.status_code}")
+            print(f" {response}")
             if response.status_code not in assert_status_in:
                 raise Exception
         except Exception:
