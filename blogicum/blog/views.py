@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Count
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse_lazy
 from django.utils import timezone
@@ -102,6 +102,7 @@ class PostDetailView(UserPassesTestMixin, DetailView):
     template_name = 'blog/detail.html'
 
     def get_context_data(self, **kwargs):
+        self.object = self.get_object()
         context = super().get_context_data(**kwargs)
         context["form"] = CommentForm()
         context["comments"] = self.object.comments.select_related('author')
@@ -114,8 +115,7 @@ class PostDetailView(UserPassesTestMixin, DetailView):
         return post.author == self.request.user
 
     def handle_no_permission(self):
-        return csrf_failure(self.get_context_data())
-
+        return HttpResponseNotFound()
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     form_class = PostForm
