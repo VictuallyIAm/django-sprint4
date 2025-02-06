@@ -19,7 +19,8 @@ urlpatterns = [
             success_url=reverse_lazy('blog:index'),
         ),
         name='registration',
-    ),    path('pages/', include('pages.urls')),
+    ),
+    path('pages/', include('pages.urls')),
     path('admin/', admin.site.urls),
 ]
 if settings.DEBUG:

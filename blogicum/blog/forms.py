@@ -7,7 +7,9 @@ from .models import Post, Comment
 
 User = get_user_model()
 
+
 class ProfileForm(forms.ModelForm):
+    """Form for profile, model - standard User model"""
 
     class Meta:
         model = User
@@ -18,7 +20,9 @@ class ProfileForm(forms.ModelForm):
             'email',
         )
 
+
 class PostForm(forms.ModelForm):
+    """Form for Post"""
 
     class Meta:
         model = Post
@@ -38,7 +42,9 @@ class PostForm(forms.ModelForm):
             ),
         }
 
+
 class CommentForm(forms.ModelForm):
+    """Form for Comment"""
 
     class Meta:
         model = Comment

@@ -134,5 +134,6 @@ class Comment(models.Model):
         related_name='comments',
         verbose_name='Пост комментария'
     )
+
     class Meta:
         ordering = ('created_at',)
