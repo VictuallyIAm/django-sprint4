@@ -96,7 +96,6 @@ class ContentTester(ABC):
         url = url or self.page_url.url
         try:
             response = client.get(url)
-            print(f" {response}")
             if response.status_code not in assert_status_in:
                 raise Exception
         except Exception:
@@ -384,24 +383,8 @@ class TestContent:
         except AssertionError:
             pass
         else:
-            # Сначала попробуй заменить строку 391 той, что ниже, запусти pytest -s, посмотри, как изменится тест.
-            # context_posts = response.context.get(items_key).object_list
-
             context_posts = response.context.get(items_key)
-            
-            
 
-            # С той же строкой раскомментируй то что ниже и ебани снова pytest -s
-
-            # expected_post = post_with_published_location
-
-            # print(f"Context posts: {[post.title for post in context_posts]}")
-            # print(f"Expected post: {expected_post.title}")
-            
-            
-            # Далее расскомменти это, а так же расскомментируй то, что внутри CategoryListView в views.py 
-            # print(
-            #     f"Expected post author: {post_with_published_location.author}")
             assert (
                 len(context_posts) == 1
             ), ("Убедитесь, что на странице категории "

@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Count
-from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponseNotFound
+from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponseNotFound, Http404
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse_lazy
 from django.utils import timezone
@@ -52,22 +53,13 @@ class CategoryListView(ListView):
     paginate_by = PAGE_LIMIT
 
     def get_queryset(self):
+        if not Category.objects.get(slug=self.kwargs['category_slug']).is_published:
+            raise Http404
         queryset = post_base_query(
         ).filter(
-            category__slug=self.kwargs['category_slug'],
-            author=self.request.user
+            category__slug=self.kwargs['category_slug']
         )
-        print(f"Current user: {self.request.user}")
         return queryset
-    # def get_queryset(self):
-    #     queryset = post_base_query().filter(
-    #         category__slug=self.kwargs['category_slug']
-    #     )
-
-    #     queryset = queryset.filter(author=self.request.user)
-    #     print(f"Current user: {self.request.user}")
-
-    #     return queryset
 
 
 class ProfileListView(ListView):
@@ -93,8 +85,15 @@ class ProfileListView(ListView):
         return queryset
 
     def get_context_data(self, **kwargs):
-        context = super(ProfileListView, self).get_context_data(**kwargs)
-        context['profile'] = User.objects.get(username=self.kwargs['slug'])
+        context = super().get_context_data(**kwargs)
+
+        username = self.kwargs['slug']
+        user = User.objects.filter(username=username).first()
+        if user is None:
+            raise Http404
+        print(f"is self anon? {self}")
+        context['profile'] = user
+
         return context
 
 
@@ -117,6 +116,7 @@ class PostDetailView(UserPassesTestMixin, DetailView):
 
     def handle_no_permission(self):
         return HttpResponseNotFound()
+
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     form_class = PostForm
